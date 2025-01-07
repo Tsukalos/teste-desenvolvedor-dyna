@@ -22,6 +22,8 @@ export class TasksRepository {
     if (fs.existsSync(this.filePath)) {
       const data = fs.readFileSync(this.filePath, 'utf-8');
       this.tasks = JSON.parse(data);
+      const maxId = this.tasks.reduce((max, task) => (task.id > max ? task.id : max), 0);
+      this.currentId = maxId + 1;
     }
   }
 
