@@ -20,7 +20,7 @@ install_python() {
 dev_node() {
     echo "Iniciando servidor Node.js no modo de desenvolvimento..."
     cd node-api || exit
-    npm run dev
+    npm run dev --port 8000
     cd - || exit
 }
 

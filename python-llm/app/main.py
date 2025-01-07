@@ -14,10 +14,16 @@ llm_service = LLMService()
 
 class TextData(BaseModel):
     text: str
+    lang: str
 
+
+@app.get("/")
+async def root():
+    return {"message": "API is running"}
 
 @app.post("/summarize")
 async def summarize(data: TextData):
     text = data.text
-    llm_service.summarize_text(text)
-    return "OK"
+    lang = data.lang
+    summary = llm_service.summarize_text(text, lang)
+    return {"summary": summary}

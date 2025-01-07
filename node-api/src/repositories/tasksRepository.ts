@@ -1,20 +1,43 @@
+import fs from 'fs';
+import path from 'path';
+
 interface Task {
   id: number;
   text: string;
+  lang: string;
   summary: string | null;
 }
 
 export class TasksRepository {
   private tasks: Task[] = [];
   private currentId: number = 1;
+  private filePath: string;
 
-  createTask(text: string): Task {
+  constructor() {
+    this.filePath = path.resolve(__dirname, 'tasks.json');
+    this.loadTasks();
+  }
+
+  private loadTasks() {
+    if (fs.existsSync(this.filePath)) {
+      const data = fs.readFileSync(this.filePath, 'utf-8');
+      this.tasks = JSON.parse(data);
+    }
+  }
+
+  private saveTasks() {
+    fs.writeFileSync(this.filePath, JSON.stringify(this.tasks, null, 2));
+  }
+
+  createTask(text: string, lang: string): Task {
     const task: Task = {
       id: this.currentId++,
       text,
+      lang,
       summary: null
     };
     this.tasks.push(task);
+    this.saveTasks();
     return task;
   }
 
@@ -22,6 +45,7 @@ export class TasksRepository {
     const taskIndex = this.tasks.findIndex(t => t.id === id);
     if (taskIndex > -1) {
       this.tasks[taskIndex].summary = summary;
+      this.saveTasks();
       return this.tasks[taskIndex];
     }
     return null;
@@ -33,5 +57,15 @@ export class TasksRepository {
 
   getAllTasks(): Task[] {
     return this.tasks;
+  }
+
+  deleteTask(id: number): boolean {
+    const taskIndex = this.tasks.findIndex(t => t.id === id);
+    if (taskIndex > -1) {
+      this.tasks.splice(taskIndex, 1);
+      this.saveTasks();
+      return true;
+    }
+    return false;
   }
 }
